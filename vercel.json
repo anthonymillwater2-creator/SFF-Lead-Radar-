@@ -1,26 +1,10 @@
 {
-  "version": 2,
   "buildCommand": "npm run build",
-  "devCommand": "npm run dev",
-  "installCommand": "npm install",
-  "framework": null,
   "outputDirectory": "dist",
-  "builds": [
+  "rewrites": [
     {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
