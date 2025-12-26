@@ -6,9 +6,10 @@ import { LeadEventType } from '@prisma/client';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -18,7 +19,7 @@ export async function POST(
     const { eventType, messagePreview, templateId } = body;
 
     const lead = await prisma.lead.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!lead || lead.userId !== session.user.id) {
@@ -56,7 +57,7 @@ export async function POST(
     await prisma.leadEvent.create({
       data: {
         userId: session.user.id,
-        leadId: params.id,
+        leadId: id,
         eventType: eventType as LeadEventType,
         messagePreview,
         templateId,
@@ -66,7 +67,7 @@ export async function POST(
 
     // Update lead
     const updatedLead = await prisma.lead.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         status: newStatus,
         lastOutreachAt: now,

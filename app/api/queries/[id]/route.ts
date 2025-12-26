@@ -5,9 +5,10 @@ import { prisma } from '@/lib/prisma';
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -17,7 +18,7 @@ export async function PATCH(
     const { name, baseQueryText, isActive } = body;
 
     const query = await prisma.query.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!query || query.userId !== session.user.id) {
@@ -25,7 +26,7 @@ export async function PATCH(
     }
 
     const updatedQuery = await prisma.query.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(name !== undefined && { name }),
         ...(baseQueryText !== undefined && { baseQueryText }),

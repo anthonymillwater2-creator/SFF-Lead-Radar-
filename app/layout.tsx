@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import SessionProvider from "@/components/SessionProvider";
 import Navigation from "@/components/Navigation";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,6 +29,7 @@ export default async function RootLayout({
           <main className="min-h-screen bg-gray-50">
             {children}
           </main>
+          <Analytics />
         </SessionProvider>
       </body>
     </html>

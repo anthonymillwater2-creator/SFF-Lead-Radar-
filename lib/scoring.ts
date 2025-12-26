@@ -131,21 +131,21 @@ export function scoreLead(
   }
 
   // BUYER TYPE DETECTION
-  let buyerType = BuyerType.UNKNOWN;
+  let buyerType: BuyerType = BuyerType.UNKNOWN;
   if (/\bagency\b/i.test(text)) {
-    buyerType = BuyerType.AGENCY;
+    buyerType = BuyerType.AGENCY as BuyerType;
   } else if (/\bpodcast/i.test(text)) {
-    buyerType = BuyerType.PODCASTER;
+    buyerType = BuyerType.PODCASTER as BuyerType;
   } else if (/\bcoach\b/i.test(text) || /\bconsultant\b/i.test(text)) {
-    buyerType = BuyerType.COACH;
+    buyerType = BuyerType.COACH as BuyerType;
   } else if (/\becom\b/i.test(text) || /\bugc\b/i.test(text) || /\bads\b/i.test(text)) {
-    buyerType = BuyerType.ECOM;
+    buyerType = BuyerType.ECOM as BuyerType;
   } else if (
     /\bcreator\b/i.test(text) ||
     /\byoutuber\b/i.test(text) ||
     /\binfluencer\b/i.test(text)
   ) {
-    buyerType = BuyerType.CREATOR;
+    buyerType = BuyerType.CREATOR as BuyerType;
   }
 
   // PAIN TAGS
@@ -171,11 +171,11 @@ export function scoreLead(
     /\bimmediate/i.test(text);
 
   // QUALIFICATION & STATUS
-  let status = LeadStatus.REVIEW;
+  let status: LeadStatus = LeadStatus.REVIEW;
   if (score >= 70) {
-    status = LeadStatus.OUTREACH_READY;
+    status = LeadStatus.OUTREACH_READY as LeadStatus;
   } else if (score < 40) {
-    status = LeadStatus.REJECTED;
+    status = LeadStatus.REJECTED as LeadStatus;
   }
 
   return {
