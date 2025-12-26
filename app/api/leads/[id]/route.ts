@@ -5,16 +5,17 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const lead = await prisma.lead.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         leadEvents: {
           orderBy: { createdAt: 'desc' },
@@ -39,9 +40,10 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -51,7 +53,7 @@ export async function PATCH(
     const { status, notes, nextFollowUpAt, offerAngle } = body;
 
     const lead = await prisma.lead.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!lead || lead.userId !== session.user.id) {
@@ -59,7 +61,7 @@ export async function PATCH(
     }
 
     const updatedLead = await prisma.lead.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(status && { status }),
         ...(notes !== undefined && { notes }),
