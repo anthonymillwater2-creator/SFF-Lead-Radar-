@@ -1,11 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
+type RouteContext = { params: { id: string } };
+
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  request: Request,
+  { params }: RouteContext
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -38,8 +40,8 @@ export async function GET(
 }
 
 export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  request: Request,
+  { params }: RouteContext
 ) {
   try {
     const session = await getServerSession(authOptions);

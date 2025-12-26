@@ -1,12 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { LeadEventType } from '@prisma/client';
 
+type RouteContext = { params: { id: string } };
+
 export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  request: Request,
+  { params }: RouteContext
 ) {
   try {
     const session = await getServerSession(authOptions);
