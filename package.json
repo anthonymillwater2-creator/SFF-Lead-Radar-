@@ -1,31 +1,45 @@
 {
   "name": "sff-lead-radar",
   "version": "1.0.0",
-  "type": "module",
-  "description": "(find + qualify + pitch + track)",
+  "description": "ShortFormFactory Lead Finder - Find, qualify, pitch, and track video editing leads",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "postinstall": "prisma generate",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts"
   },
   "repository": {
     "type": "git",
     "url": "http://local_proxy@127.0.0.1:60553/git/anthonymillwater2-creator/SFF-Lead-Radar-"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["lead-generation", "bing-api", "nextjs", "crm"],
+  "author": "ShortFormFactory",
   "license": "ISC",
   "dependencies": {
-    "lucide-react": "^0.562.0",
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "@next-auth/prisma-adapter": "^1.0.7",
+    "@prisma/client": "^5.22.0",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.6",
+    "@types/react-dom": "^19.0.2",
+    "next": "^15.1.6",
+    "next-auth": "^4.24.11",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "lucide-react": "^0.462.0",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.7.2",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
-    "@vitejs/plugin-react": "^5.1.2",
     "autoprefixer": "^10.4.23",
     "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.18",
-    "vite": "^7.3.0"
+    "prisma": "^5.22.0",
+    "tsx": "^4.19.2",
+    "eslint": "^9.18.0",
+    "eslint-config-next": "^15.1.6"
   }
 }

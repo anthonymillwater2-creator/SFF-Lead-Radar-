@@ -1,0 +1,295 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  settings   Settings?
+  queries    Query[]
+  runs       Run[]
+  leads      Lead[]
+  leadEvents LeadEvent[]
+  accounts   Account[]
+  sessions   Session[]
+  templates  Template[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Settings {
+  id                      String   @id @default(cuid())
+  userId                  String   @unique
+  orderPageUrl            String   @default("")
+  utmSource               String   @default("leadgen_app")
+  utmMedium               String   @default("outreach")
+  maxResultsPerRun        Int      @default(50)
+  queryMaxRunsPerDay      Int      @default(5)
+  globalCooldownMinutes   Int      @default(2)
+  jobBoardBlocklist       String[] @default([])
+  fu1DelayHours           Int      @default(48)
+  fu2DelayHours           Int      @default(96)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum QueryCategory {
+  PODCAST_REPURPOSE
+  VIRAL_CAPTIONS
+  SMART_CUT
+  RUSH
+  AGENCY_OVERFLOW
+  COACHES_CONSULTANTS
+  ECOM_UGC
+  RETENTION_HOOK
+  BATCH_PRODUCTION
+  ZERO_VIEWS
+  PODCAST_HIGHLIGHTS
+  AUDIO_PROBLEMS
+  RENDER_ISSUES
+  HIRING_SHORTS_EDITOR
+  REPURPOSE_LONGFORM
+  GENERAL_NEED_EDITOR
+  MASTER
+  HIRING_NOW
+  SWAMPED
+  AGENCY_OVERFLOW_MASTER
+}
+
+enum MappedService {
+  AI_REEL_EDIT
+  SOCIAL_MEDIA_EDIT
+  VIRAL_CAPTIONS
+  PODCAST_YOUTUBE_REPURPOSE
+  AUTO_CAPTIONS
+  VIDEO_TRIM_SMART_CUT
+  RUSH_12_HOUR
+  UNKNOWN
+}
+
+model Query {
+  id             String        @id @default(cuid())
+  userId         String
+  name           String
+  engine         String        @default("bing")
+  category       QueryCategory
+  mappedService  MappedService
+  baseQueryText  String
+  isActive       Boolean       @default(true)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  runs Run[]
+
+  @@index([userId, isActive])
+}
+
+enum SourcePack {
+  FORUMS
+  SOCIAL
+  PROFESSIONAL
+  WIDE_WEB
+}
+
+model Run {
+  id                 String     @id @default(cuid())
+  userId             String
+  queryId            String
+  sourcePack         SourcePack
+  market             String     @default("en-US")
+  freshness          String     @default("Week")
+  startedAt          DateTime   @default(now())
+  finishedAt         DateTime?
+  totalResults       Int        @default(0)
+  qualifiedResults   Int        @default(0)
+  reviewResults      Int        @default(0)
+  rejectedResults    Int        @default(0)
+  duplicatesRemoved  Int        @default(0)
+  error              String?
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  query Query @relation(fields: [queryId], references: [id], onDelete: Cascade)
+
+  @@index([userId, startedAt])
+  @@index([queryId])
+}
+
+enum BuyerType {
+  AGENCY
+  PODCASTER
+  COACH
+  ECOM
+  CREATOR
+  UNKNOWN
+}
+
+enum LeadStatus {
+  OUTREACH_READY
+  REVIEW
+  REJECTED
+  CONTACTED
+  REPLIED
+  BOOKED
+  WON
+  LOST
+  NO_RESPONSE
+}
+
+enum OverrideReason {
+  SELLER_POST
+  TOO_OLD
+  WRONG_NICHE
+  JOB_BOARD
+  LOW_INTENT
+  OTHER
+}
+
+enum OfferAngle {
+  FIXED_PRICE
+  SPEED_48H
+  LOCAL_US_CA
+  RUSH_12H
+  ANY
+}
+
+model Lead {
+  id                     String          @id @default(cuid())
+  userId                 String
+  originalUrl            String
+  canonicalUrl           String
+  urlHash                String
+  title                  String
+  snippet                String
+  sourceHost             String
+  firstSeenAt            DateTime        @default(now())
+  lastSeenAt             DateTime        @default(now())
+  dateUnknown            Boolean         @default(true)
+  buyerType              BuyerType       @default(UNKNOWN)
+  painTags               String[]        @default([])
+  mappedService          MappedService   @default(UNKNOWN)
+  offerAngle             OfferAngle      @default(ANY)
+  score                  Int             @default(0)
+  status                 LeadStatus      @default(REVIEW)
+  forcedStatusOverride   LeadStatus?
+  overrideReason         OverrideReason?
+  lastOutreachAt         DateTime?
+  nextFollowUpAt         DateTime?
+  rush12HourEligible     Boolean         @default(false)
+  notes                  String          @default("")
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  leadEvents LeadEvent[]
+
+  @@unique([userId, canonicalUrl])
+  @@index([userId, status])
+  @@index([userId, nextFollowUpAt])
+  @@index([urlHash])
+}
+
+enum LeadEventType {
+  STATUS_CHANGE
+  DM_1_SENT
+  FU_1_SENT
+  FU_2_SENT
+  OUTREACH_SENT
+  FOLLOWUP_SENT
+  REPLY_RECEIVED
+  BOOKED
+  WON
+  LOST
+  NOTE_ADDED
+  SNOOZED
+  OVERRIDE
+}
+
+model LeadEvent {
+  id             String        @id @default(cuid())
+  userId         String
+  leadId         String
+  eventType      LeadEventType
+  payloadJson    String        @default("{}")
+  messagePreview String?
+  templateId     String?
+  createdAt      DateTime      @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId, createdAt])
+  @@index([userId, createdAt])
+}
+
+enum TemplateType {
+  DM_1
+  FU_1
+  FU_2
+}
+
+model Template {
+  id                    String        @id @default(cuid())
+  userId                String
+  name                  String
+  type                  TemplateType
+  bodyText              String
+  applicableOfferAngle  OfferAngle    @default(ANY)
+  applicableBuyerType   BuyerType     @default(UNKNOWN)
+  applicableService     MappedService @default(UNKNOWN)
+  priority              Int           @default(0)
+  isActive              Boolean       @default(true)
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type, isActive])
+}
