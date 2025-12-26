@@ -15,7 +15,12 @@
     "type": "git",
     "url": "http://local_proxy@127.0.0.1:60553/git/anthonymillwater2-creator/SFF-Lead-Radar-"
   },
-  "keywords": ["lead-generation", "bing-api", "nextjs", "crm"],
+  "keywords": [
+    "lead-generation",
+    "bing-api",
+    "nextjs",
+    "crm"
+  ],
   "author": "ShortFormFactory",
   "license": "ISC",
   "dependencies": {
@@ -24,11 +29,12 @@
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.6",
     "@types/react-dom": "^19.0.2",
+    "@vercel/speed-insights": "^1.3.1",
+    "lucide-react": "^0.462.0",
     "next": "^15.1.6",
     "next-auth": "^4.24.11",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "lucide-react": "^0.462.0",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.7.2",
     "zod": "^3.24.1"
@@ -36,10 +42,10 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
     "autoprefixer": "^10.4.23",
+    "eslint": "^9.18.0",
+    "eslint-config-next": "^15.1.6",
     "postcss": "^8.5.6",
     "prisma": "^5.22.0",
-    "tsx": "^4.19.2",
-    "eslint": "^9.18.0",
-    "eslint-config-next": "^15.1.6"
+    "tsx": "^4.19.2"
   }
 }
