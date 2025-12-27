@@ -4,11 +4,9 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { LeadEventType } from '@prisma/client';
 
-type RouteContext = { params: Promise<{ id: string }> };
-
 export async function POST(
   request: Request,
-  { params }: RouteContext
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
