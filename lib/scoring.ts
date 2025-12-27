@@ -131,7 +131,7 @@ export function scoreLead(
   }
 
   // BUYER TYPE DETECTION
-  let buyerType = BuyerType.UNKNOWN;
+  let buyerType: BuyerType = BuyerType.UNKNOWN;
   if (/\bagency\b/i.test(text)) {
     buyerType = BuyerType.AGENCY;
   } else if (/\bpodcast/i.test(text)) {
@@ -171,7 +171,7 @@ export function scoreLead(
     /\bimmediate/i.test(text);
 
   // QUALIFICATION & STATUS
-  let status = LeadStatus.REVIEW;
+  let status: LeadStatus = LeadStatus.REVIEW;
   if (score >= 70) {
     status = LeadStatus.OUTREACH_READY;
   } else if (score < 40) {
