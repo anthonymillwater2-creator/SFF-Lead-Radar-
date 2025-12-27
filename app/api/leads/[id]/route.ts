@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
-type RouteContext = { params: { id: string } };
+type RouteContext = { params: Promise<{ id: string }> };
 
 export async function GET(
   request: Request,
@@ -15,8 +15,9 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const resolvedParams = await params;
     const lead = await prisma.lead.findUnique({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
       include: {
         leadEvents: {
           orderBy: { createdAt: 'desc' },
@@ -49,11 +50,12 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const resolvedParams = await params;
     const body = await request.json();
     const { status, notes, nextFollowUpAt, offerAngle } = body;
 
     const lead = await prisma.lead.findUnique({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
     });
 
     if (!lead || lead.userId !== session.user.id) {
@@ -61,7 +63,7 @@ export async function PATCH(
     }
 
     const updatedLead = await prisma.lead.update({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
       data: {
         ...(status && { status }),
         ...(notes !== undefined && { notes }),

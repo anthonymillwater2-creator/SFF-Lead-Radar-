@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
-type RouteContext = { params: { id: string } };
+type RouteContext = { params: Promise<{ id: string }> };
 
 export async function PATCH(
   request: Request,
@@ -15,11 +15,12 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const resolvedParams = await params;
     const body = await request.json();
     const { name, baseQueryText, isActive } = body;
 
     const query = await prisma.query.findUnique({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
     });
 
     if (!query || query.userId !== session.user.id) {
@@ -27,7 +28,7 @@ export async function PATCH(
     }
 
     const updatedQuery = await prisma.query.update({
-      where: { id: params.id },
+      where: { id: resolvedParams.id },
       data: {
         ...(name !== undefined && { name }),
         ...(baseQueryText !== undefined && { baseQueryText }),
